@@ -20,6 +20,11 @@ jobs:
       My_Name: "Hazem Hussien"
     steps:
       - run: echo $My_Name
+  print_new_env_var:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - run: echo $newVar
 workflows:
   # Name the workflow "welcome"
   welcome:
@@ -30,3 +35,4 @@ workflows:
           requires:
             - print_hello
       - print_my-name
+      - print_new_env_var
