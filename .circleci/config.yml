@@ -1,39 +1,56 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-# Use a package of configuration called an orb.
-# Orchestrate or schedule a set of jobs
+
 jobs:
-  print_hello:
+  save_hello_world_output:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      - run: echo hello
-  print_world:
+      - run: echo "text to output here" > output.txt
+      - persist_to_workspace:
+          root: /tmp/dir
+          paths:
+            - output.txt
+  print_output_file:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      - run: echo world
-  print_my-name:
-    docker:
-      - image: circleci/node:13.8.0
-    environment:
-      My_Name: "Hazem Hussien"
-    steps:
-      - run: echo $My_Name
-  print_new_env_var:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - run: echo $My_Name
-      - run: echo $CIRCLE_BRANCH
+      - attach_workspace:
+          at: /tmp/dir
+      - run: cat output.txt
+  #print_hello:
+  #  docker:
+  #    - image: circleci/node:13.8.0
+  #  steps:
+  #    - run: echo hello
+  #print_world:
+  #  docker:
+  #    - image: circleci/node:13.8.0
+  #  steps:
+  #    - run: echo world
+  #print_my-name:
+  #  docker:
+  #    - image: circleci/node:13.8.0
+  #  environment:
+  #    My_Name: "Hazem Hussien"
+  #  steps:
+  #    - run: echo $My_Name
+  #print_new_env_var:
+  #  docker:
+  #    - image: circleci/node:13.8.0
+  #  steps:
+  #    - run: echo $My_Name
+  #    - run: echo $CIRCLE_BRANCH
+
 workflows:
-  # Name the workflow "welcome"
   welcome:
-    # Run the welcome/run job in its own container
     jobs:
-      - print_hello
-      - print_world:
+    #  - print_hello
+    # - print_world:
+    #      requires:
+    #        - print_hello
+    #  - print_my-name
+    #  - print_new_env_var
+      - save_hello_world_output
+      - print_output_file:
           requires:
-            - print_hello
-      - print_my-name
-      - print_new_env_var
+            - save_hello_world_output
